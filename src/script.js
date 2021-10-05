@@ -283,6 +283,8 @@ const playHitSound = (collision) => {
   }
 };
 
+let colorArray = [];
+
 //-------------------------------------Textures-------------------------------------^
 
 const textureLoader = new THREE.TextureLoader();
@@ -747,7 +749,7 @@ const sphereMaterial = new THREE.MeshStandardMaterial({
 const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphereMesh.castShadow = true;
 sphereMesh.position.set(0, 3, 5);
-sphereMesh.add(axesHelper);
+// sphereMesh.add(axesHelper);
 scene.add(sphereMesh);
 
 // Cannon.js body
@@ -791,6 +793,7 @@ for (let i = 0; i < 15; i++) {
   });
 
   soundArray.push(boxBody);
+  colorArray.push({ mesh: box, body: boxBody });
   world.addBody(boxBody);
   objectsToUpdate.push({ mesh: box, body: boxBody });
 }
@@ -819,6 +822,7 @@ for (let i = 0; i < 15; i++) {
   });
 
   soundArray.push(ballBody);
+  colorArray.push({ mesh: ball, body: ballBody });
   world.addBody(ballBody);
   objectsToUpdate.push({ mesh: ball, body: ballBody });
 }
@@ -989,6 +993,21 @@ function moveObj() {
 
 soundArray.forEach((element) => {
   element.addEventListener("collide", playHitSound);
+});
+
+//-------------------------------------Changing color-------------------------------------^
+
+colorArray.forEach((element) => {
+  element.body.addEventListener("collide", (collision) => {
+    const impactStrength = collision.contact.getImpactVelocityAlongNormal();
+    if (impactStrength > 10) {
+      const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+      const newMaterial = new THREE.MeshStandardMaterial({
+        color: `#${randomColor}`,
+      });
+      element.mesh.material = newMaterial;
+    }
+  });
 });
 
 //-------------------------------------Renderer-------------------------------------^
