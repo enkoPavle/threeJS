@@ -142,12 +142,14 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
       case "KeyA":
       case "ArrowLeft":
-        this.rotation += 1;
-        this.rotate(this.rotation);
+        // this.rotation += 1;
+        // this.rotate(this.rotation);
+        this.moveLeft = true;
+
         break;
 
       case "KeyQ":
-        this.moveLeft = true;
+        // this.moveLeft = true;
         break;
       case "KeyS":
       case "ArrowDown":
@@ -156,12 +158,13 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
       case "KeyD":
       case "ArrowRight":
-        this.rotation -= 1;
-        this.rotate(this.rotation);
+        // this.rotation -= 1;
+        // this.rotate(this.rotation);
+        this.moveRight = true;
         break;
 
       case "KeyE":
-        this.moveRight = true;
+        // this.moveRight = true;
         break;
 
       case "Space":
@@ -819,7 +822,6 @@ for (let i = 0; i < 15; i++) {
   world.addBody(ballBody);
   objectsToUpdate.push({ mesh: ball, body: ballBody });
 }
-
 
 //-------------------------------------Floor-------------------------------------^
 
