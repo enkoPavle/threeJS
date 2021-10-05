@@ -6,7 +6,7 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
   constructor(camera, cannonBody) {
     super();
 
-    this.enabled = true;
+    this.enabled = false;
 
     this.cannonBody = cannonBody;
 
@@ -77,16 +77,16 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     document.addEventListener("keyup", this.onKeyUp);
   }
 
-  // disconnect() {
-  //   document.removeEventListener('mousemove', this.onMouseMove)
-  //   document.removeEventListener('pointerlockchange', this.onPointerlockChange)
-  //   document.removeEventListener('pointerlockerror', this.onPointerlockError)
-  //   document.removeEventListener('keydown', this.onKeyDown)
-  //   document.removeEventListener('keyup', this.onKeyUp)
-  // }
+  disconnect() {
+    document.removeEventListener("mousemove", this.onMouseMove);
+    document.removeEventListener("pointerlockchange", this.onPointerlockChange);
+    document.removeEventListener("pointerlockerror", this.onPointerlockError);
+    document.removeEventListener("keydown", this.onKeyDown);
+    document.removeEventListener("keyup", this.onKeyUp);
+  }
 
   dispose() {
-    // this.disconnect()
+    this.disconnect();
   }
 
   lock() {
@@ -100,11 +100,9 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
   onPointerlockChange = () => {
     if (document.pointerLockElement) {
       this.dispatchEvent(this.lockEvent);
-
       this.isLocked = true;
     } else {
       this.dispatchEvent(this.unlockEvent);
-
       this.isLocked = false;
     }
   };
@@ -117,11 +115,8 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     if (!this.enabled) {
       return;
     }
-    const { movementX, movementY } = event;
+    const { movementX } = event;
     this.yawObject.rotation.y -= movementX * 0.008;
-    // this.pitchObject.rotation.x -= movementY * 0.002
-
-    // this.pitchObject.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.pitchObject.rotation.x))
   };
 
   rotate(rotation) {
@@ -142,15 +137,9 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
       case "KeyA":
       case "ArrowLeft":
-        // this.rotation += 1;
-        // this.rotate(this.rotation);
         this.moveLeft = true;
-
         break;
 
-      case "KeyQ":
-        // this.moveLeft = true;
-        break;
       case "KeyS":
       case "ArrowDown":
         this.moveBackward = true;
@@ -158,13 +147,7 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
       case "KeyD":
       case "ArrowRight":
-        // this.rotation -= 1;
-        // this.rotate(this.rotation);
         this.moveRight = true;
-        break;
-
-      case "KeyE":
-        // this.moveRight = true;
         break;
 
       case "Space":
@@ -274,13 +257,12 @@ const hitSound = new Audio("/sounds/hit.mp3");
 let soundArray = [];
 
 const playHitSound = (collision) => {
-  const impactStrength = collision.contact.getImpactVelocityAlongNormal();
-
-  if (impactStrength > 1.5) {
-    hitSound.volume = Math.random();
-    hitSound.currentTime = 0;
-    hitSound.play();
-  }
+  // const impactStrength = collision.contact.getImpactVelocityAlongNormal();
+  // if (impactStrength > 1.5) {
+  //   hitSound.volume = Math.random();
+  //   hitSound.currentTime = 0;
+  //   hitSound.play();
+  // }
 };
 
 let colorArray = [];
@@ -902,19 +884,19 @@ function initPointerLock() {
   controls = new PointerLockControlsCannon(camera, sphereBody);
   scene.add(controls.getObject());
 
-  // instructions.addEventListener('click', () => {
-  //   controls.lock()
-  // })
+  document.body.addEventListener("click", (event) => {
+    controls.lock();
+  });
 
-  // controls.addEventListener('lock', () => {
-  //   controls.enabled = true
-  //   instructions.style.display = 'none'
-  // })
+  controls.addEventListener("lock", () => {
+    controls.enabled = true;
+    canvas.style.zIndex = 0
+  });
 
-  // controls.addEventListener('unlock', () => {
-  //   controls.enabled = false
-  //   instructions.style.display = null
-  // })
+  controls.addEventListener("unlock", () => {
+    controls.enabled = false;
+    canvas.style.zIndex = -1
+  });
 }
 
 let Up,
@@ -1015,7 +997,7 @@ colorArray.forEach((element) => {
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
